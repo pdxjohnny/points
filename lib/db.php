@@ -64,6 +64,8 @@ class Database
         } else if (isset($user['username'])) {
             $statement = $this->db->prepare('SELECT id FROM USERS WHERE username=:username');
             $statement->bindValue(':username', $user['username'], PDO::PARAM_STR);
+        } else {
+            return false;
         }
         $statement->execute();
         if ($result = $statement->fetchAll(PDO::FETCH_ASSOC))
