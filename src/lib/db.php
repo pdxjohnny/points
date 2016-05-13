@@ -27,8 +27,8 @@ class Database
     public function table_exists($table_name)
     {
         $exists = false;
-        $statement = $this->db->prepare("SELECT table_name FROM USERS WHERE table_name=':table_name'");
-        $statement->bindValue(':table_name', $table_name, PDO::FETCH_ASSOC);
+        $statement = $this->db->prepare("SHOW TABLES LIKE '" . $table_name . "'");
+        $statement->bindValue(':table_name', $table_name, PDO::PARAM_STR);
 
         try {
             $statement->execute();
@@ -47,56 +47,85 @@ class Database
     {
         if (!$this->table_exists('USERS'))
         {
-            $this->db->exec("CREATE TABLE IF NOT EXISTS USERS (username VARCHAR(100), password VARCHAR(100), table_name VARCHAR(100) PRIMARY KEY)");
+            $this->db->exec("CREATE TABLE IF NOT EXISTS USERS (id INT NOT NULL AUTO_INCREMENT, username VARCHAR(100) NOT NULL, password VARCHAR(100) NOT NULL, PRIMARY KEY (id))");
         }
     }
 
     public function check_user($user)
     {
         $username = false;
-        $table_name = false;
-        if (isset($user['username']))
+        // Check the user
+        if (isset($user['id']))
         {
-            $statement = $this->db->prepare('SELECT * FROM USERS WHERE username=:username');
-            $statement->bindValue(':username', $user['username'], PDO::FETCH_ASSOC);
-            $statement->execute();
-            if ($result = $statement->fetchAll(PDO::FETCH_ASSOC))
-            {
-                    $username = count((array)$result);
-            }
+            $statement = $this->db->prepare('SELECT id FROM USERS WHERE id=:id');
+            $statement->bindValue(':id', $user['id'], PDO::PARAM_INT);
+        } else if (isset($user['username'])) {
+            $statement = $this->db->prepare('SELECT id FROM USERS WHERE username=:username');
+            $statement->bindValue(':username', $user['username'], PDO::PARAM_STR);
         }
-        if (isset($user['table_name']))
+        $statement->execute();
+        if ($result = $statement->fetchAll(PDO::FETCH_ASSOC))
         {
-            $table_name = $this->check_table($user['table_name']);
+            $username = count((array)$result);
         }
-        if ($table_name || $username)
+        if ($username)
         {
             return true;
         }
         return false;
     }
 
-    public function user($user)
+    public function login_user($user)
     {
-        if (!isset($user['username']) || !isset($user['password']))
+        if (!(isset($user['id']) || isset($user['username'])) || !isset($user['password']))
         {
             return false;
         }
-        $result = false;
-        $statement = $this->db->prepare('SELECT * FROM USERS WHERE username=:username AND password=:password');
-        $statement->bindValue(':username', $user['username'], PDO::FETCH_ASSOC);
-        $statement->bindValue(':password', $user['password'], PDO::FETCH_ASSOC);
+        $statement = false;
+        // Lookup by id is faster
+        if (isset($user['id'])) {
+            $statement = $this->db->prepare('SELECT * FROM USERS WHERE id=:id');
+            $statement->bindValue(':id', $user['id'], PDO::PARAM_INT);
+        } else {
+            $statement = $this->db->prepare('SELECT * FROM USERS WHERE username=:username');
+            $statement->bindValue(':username', $user['username'], PDO::PARAM_STR);
+        }
 
         $statement->execute();
-        if ($result = $statement->fetchAll(PDO::FETCH_ASSOC))
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC))
         {
-            $array = (array)$result;
-            if (0 == count($array))
-            {
-                $result = false;
+            if (password_verify($user['password'], $row['password'])) {
+                unset($row['password']);
+                $row['id'] = intval($row['id']);
+                return $row;
             }
         }
-        return $result;
+        return false;
+    }
+
+    public function create_user($user)
+    {
+        if ($this->check_user($user)) {
+            // Check if the user is trying to login
+            return $this->login_user($user);
+        }
+        if ($user == NULL || !isset($user['username']) || !isset($user['password']))
+        {
+            return false;
+        }
+        // Hash the password
+        $hash_options = array('cost' => 11);
+        $user['password'] = password_hash($user['password'], PASSWORD_BCRYPT, $hash_options);
+        var_dump($user);
+        echo "<br><br>";
+        $statement = $this->db->prepare("INSERT INTO USERS(username,password) VALUES(:username,:password)");
+        $statement->bindValue(':username', $user['username'], PDO::PARAM_STR);
+        $statement->bindValue(':password', $user['password'], PDO::PARAM_STR);
+        $statement->execute();
+        $user['id'] = intval($this->db->lastInsertId());
+        // Dont return the hashed password
+        unset($user['password']);
+        return $user;
     }
 
     public function table($table)
