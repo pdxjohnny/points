@@ -1,11 +1,18 @@
 web:
   image: pdxjohnny/points
+  restart: always
   ports:
     - "6534:80"
+  volumes:
+    - "$PWD/keys:/var/www/keys/"
+  environment:
+    - "TOKEN_PRIVATE_KEY=/var/www/keys/token/private.pem"
+    - "TOKEN_PUBLIC_KEY=/var/www/keys/token/public.pem"
   links:
     - db
 db:
   image: mysql
+  restart: always
   environment:
     - MYSQL_USER=user
     - MYSQL_PASSWORD=pass
