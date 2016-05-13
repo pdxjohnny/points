@@ -1,6 +1,6 @@
 <?php
 // Requires
-require_once('lib/all.php');
+require_once('/var/www/lib/all.php');
 header('Content-Type: application/json');
 
 $args = array(

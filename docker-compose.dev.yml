@@ -4,12 +4,17 @@ web:
     - "7000:80"
   volumes:
     - "$PWD/src:/var/www/html/"
+    - "$PWD/lib:/var/www/lib/"
+    - "$PWD/keys:/var/www/keys/"
+  environment:
+    - "TOKEN_PRIVATE_KEY=/var/www/keys/token/private.pem"
+    - "TOKEN_PUBLIC_KEY=/var/www/keys/token/public.pem"
   links:
     - db
 db:
   image: mysql
   environment:
-    - MYSQL_USER=user
-    - MYSQL_PASSWORD=pass
-    - MYSQL_ROOT_PASSWORD=pass
-    - MYSQL_DATABASE=testdb
+    - "MYSQL_USER=user"
+    - "MYSQL_PASSWORD=pass"
+    - "MYSQL_ROOT_PASSWORD=pass"
+    - "MYSQL_DATABASE=testdb"

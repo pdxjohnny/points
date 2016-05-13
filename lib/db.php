@@ -1,10 +1,12 @@
 <?php
 class Database
 {
+    private $token;
     private $db;
 
     public function __construct()
     {
+        $this->token = new Token;
         $this->db = null;
         try {
             $conn = 'mysql:host=' . $_ENV['DB_PORT_3306_TCP_ADDR'] .
@@ -97,6 +99,8 @@ class Database
             if (password_verify($user['password'], $row['password'])) {
                 unset($row['password']);
                 $row['id'] = intval($row['id']);
+                // Create a login token for the user
+                $row['token'] = $this->token->create($row);
                 return $row;
             }
         }
@@ -116,8 +120,6 @@ class Database
         // Hash the password
         $hash_options = array('cost' => 11);
         $user['password'] = password_hash($user['password'], PASSWORD_BCRYPT, $hash_options);
-        var_dump($user);
-        echo "<br><br>";
         $statement = $this->db->prepare("INSERT INTO USERS(username,password) VALUES(:username,:password)");
         $statement->bindValue(':username', $user['username'], PDO::PARAM_STR);
         $statement->bindValue(':password', $user['password'], PDO::PARAM_STR);
@@ -125,6 +127,8 @@ class Database
         $user['id'] = intval($this->db->lastInsertId());
         // Dont return the hashed password
         unset($user['password']);
+        // Create a login token for the user
+        $user['token'] = $this->token->create($user);
         return $user;
     }
 
