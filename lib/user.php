@@ -22,7 +22,7 @@ class User {
     }
 
     public function to_html() {
-        $grav_url = "http://www.gravatar.com/avatar/";
+        $grav_url = "https://www.gravatar.com/avatar/";
         $grav_url .= md5(strtolower(trim($this->username)));
         $html = "<div class=\"item\">";
         $html .= "<img class=\"ui avatar image\" src=\"" . $grav_url . "\">";
