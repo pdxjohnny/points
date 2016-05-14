@@ -4,7 +4,7 @@ $protect = new ProtectWithAuth;
 $register_err = false;
 
 $args = array(
-    'username'	=> FILTER_SANITIZE_ENCODED,
+    'username'	=> FILTER_VALIDATE_EMAIL,
     'password'	=> FILTER_SANITIZE_ENCODED,
 );
 

@@ -1,24 +1,27 @@
 <?php
 require_once('/var/www/lib/all.php');
 $protect = new ProtectWithAuth;
+$search_user = "";
 $search_err = false;
 $search_res = false;
 
 $args = array(
-    'username'	=> FILTER_SANITIZE_ENCODED,
+    'username'	=> FILTER_VALIDATE_EMAIL,
 );
 
 $user = client_input($args);
 if ($user != false) {
+    $search_user = $user['username'];
     $database = new Database;
     $user = $database->check_user($user);
     if ($user == false) {
         $search_err = "Could not find that user";
     } else {
-        $search_res = "Found user";
+        $search_res = $user->to_html();
     }
 }
-?><!DOCTYPE html>
+?>
+<!DOCTYPE html>
 <html>
 <head>
     <!-- Standard Meta -->
@@ -58,7 +61,7 @@ if ($user != false) {
                     <div class="field">
                         <div class="ui left icon input">
                             <i class="user icon"></i>
-                            <input type="text" name="username" placeholder="E-mail address">
+                            <input type="text" name="username" placeholder="E-mail address" value="<?php echo $search_user;?>">
                         </div>
                     </div>
                     <button class="ui fluid large teal button">Search</button>

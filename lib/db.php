@@ -45,12 +45,19 @@ class Database
         return $exists;
     }
 
-    private function create_users()
-    {
-        if (!$this->table_exists('USERS'))
-        {
-            $this->db->exec("CREATE TABLE IF NOT EXISTS USERS (id INT NOT NULL AUTO_INCREMENT, username VARCHAR(100) NOT NULL, password VARCHAR(100) NOT NULL, PRIMARY KEY (id))");
+    private function create_users() {
+        if (!$this->table_exists('USERS')) {
+            $this->db->exec("CREATE TABLE IF NOT EXISTS USERS (id INT NOT NULL AUTO_INCREMENT, username VARCHAR(100) NOT NULL, password VARCHAR(100) NOT NULL, points INT DEFAULT 100, PRIMARY KEY (id))");
         }
+    }
+
+    public function top_100_users($onuser) {
+        $statement = $this->db->prepare('SELECT id,username,points FROM USERS ORDER BY points DESC LIMIT 100');
+        $statement->execute();
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $onuser(new User($row));
+        }
+        return true;
     }
 
     public function check_user($user)
@@ -59,22 +66,17 @@ class Database
         // Check the user
         if (isset($user['id']))
         {
-            $statement = $this->db->prepare('SELECT id FROM USERS WHERE id=:id');
+            $statement = $this->db->prepare('SELECT id,username,points FROM USERS WHERE id=:id');
             $statement->bindValue(':id', $user['id'], PDO::PARAM_INT);
         } else if (isset($user['username'])) {
-            $statement = $this->db->prepare('SELECT id FROM USERS WHERE username=:username');
+            $statement = $this->db->prepare('SELECT id,username,points FROM USERS WHERE username=:username');
             $statement->bindValue(':username', $user['username'], PDO::PARAM_STR);
         } else {
             return false;
         }
         $statement->execute();
-        if ($result = $statement->fetchAll(PDO::FETCH_ASSOC))
-        {
-            $username = count((array)$result);
-        }
-        if ($username)
-        {
-            return true;
+        if ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            return new User($row);
         }
         return false;
     }
@@ -109,10 +111,9 @@ class Database
         return false;
     }
 
-    public function create_user($user)
-    {
+    public function create_user($user) {
         // Check if this username is alreay taken
-        if ($this->check_user($user)) {
+        if ($this->check_user($user) != false) {
             return false;
         }
         if ($user == NULL || !isset($user['username']) || !isset($user['password']))

@@ -1,3 +1,11 @@
+<?php
+require_once('/var/www/lib/all.php');
+$protect = new ProtectWithAuth;
+
+function display_user($user) {
+    echo $user->to_html();
+}
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,6 +22,10 @@
     <style type="text/css">
         .main.container {
             margin-top: 7em;
+        }
+        .list .item {
+            margin-top: 1em;
+            margin-bottom: 1em;
         }
     </style>
 </head>
@@ -36,6 +48,12 @@
                 </h2>
                 <p>Who's got the most points?</p>
             </div>
+        </div>
+        <div class="ui list">
+            <?php
+            $database = new Database;
+            $database->top_100_users(display_user);
+            ?>
         </div>
     </div>
 
