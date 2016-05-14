@@ -26,7 +26,7 @@
 
     <div class="ui fixed menu">
         <div class="ui container">
-            <a href="/" class="header item">Leaderboard</a>
+            <a href="/" class="item">Leaderboard</a>
             <a href="/search/" class="item">Search</a>
             <a href="/award/" class="item">Award</a>
             <a href="/login/" class="item">Login</a>

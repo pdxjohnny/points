@@ -5,23 +5,37 @@ if (!$protect->logged_in()) {
     $protect->error(false, "Please login to award points");
     return;
 }
-$search_user = "";
-$search_err = false;
-$search_res = false;
+$target_user = "";
+$target_err = false;
+$target_res = false;
 
 $args = array(
     'username'	=> FILTER_VALIDATE_EMAIL,
+    'points'    => FILTER_VALIDATE_INT,
 );
 
-$user = client_input($args);
-if ($user != false) {
-    $search_user = $user['username'];
+$target = client_input($args);
+
+$giver = $protect->user_data();
+// Give the target some of the givers points
+if (isset($giver['uid']) && $target != false) {
     $database = new Database;
-    $user = $database->check_user($user);
-    if ($user == false) {
-        $search_err = "Could not find that user";
+    $target_user = $target['username'];
+    // Make the giver
+    $giver = array(
+        'id'    =>  $giver['uid'],
+    );
+    // Give the points from the giver to the target
+    // FIXME do this
+    // var_dump($target);
+    // if ($database->give_points($giver, $target)) {
+    // }
+    // Report both users points
+    $target = $database->check_user($target);
+    if ($target == false) {
+        $target_err = "Could not find that user";
     } else {
-        $search_res = $user->to_html();
+        $target_res = $target->to_html();
     }
 }
 ?>
@@ -62,22 +76,22 @@ if ($user != false) {
                 <h2 class="ui teal image header">
                     <div class="content">Award</div>
                 </h2>
-                <form class="ui large form" action="/search/" method="GET">
+                <form class="ui large form" action="/award/" method="GET">
                     <div class="field">
                         <div class="ui left icon input">
                             <i class="user icon"></i>
-                            <input type="text" name="username" placeholder="E-mail address" value="<?php echo $search_user;?>">
+                            <input type="text" name="username" placeholder="E-mail address" value="<?php echo $target_user;?>">
                         </div>
                     </div>
                     <button class="ui fluid large teal button">Award</button>
-                    <?php if ($search_err != false) { ?>
+                    <?php if ($target_err != false) { ?>
                     <div class="ui negative message">
-                        <p><?php echo $search_err;?></p>
+                        <p><?php echo $target_err;?></p>
                     </div>
                     <?php } ?>
-                    <?php if ($search_res != false) { ?>
+                    <?php if ($target_res != false) { ?>
                     <div class="ui message">
-                        <p><?php echo $search_res;?></p>
+                        <p><?php echo $target_res;?></p>
                     </div>
                     <?php } ?>
                 </form>

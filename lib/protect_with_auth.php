@@ -19,15 +19,30 @@ class ProtectWithAuth {
         setcookie("token", $user['token'], time() + 3600, '/');
     }
 
-    // Ensures that a user is logged in to see this resource
-    public function logged_in() {
+    public function token() {
         if (isset($_COOKIE['token'])) {
-            return $this->auth->verify($_COOKIE['token']);
+            return $_COOKIE['token'];
         }
         if (isset(getallheaders()['Authorization'])) {
-            return $this->auth->verify(getallheaders()['Authorization']);
+            return getallheaders()['Authorization'];
         }
         return false;
+    }
+
+    // Ensures that a user is logged in to see this resource
+    public function logged_in() {
+        $token = $this->token();
+        if ($token) {
+            return $this->auth->verify($token);
+        }
+        return false;
+    }
+
+    public function user_data() {
+        if (!$this->logged_in()) {
+            return array();
+        }
+        return $this->auth->token($this->token())->getClaims();
     }
 
     // Ensures that a user has permission to see resource

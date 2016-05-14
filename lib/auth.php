@@ -37,5 +37,9 @@ class Auth
         $token = (new Lcobucci\JWT\Parser())->parse((string) $token_string);
         return $token->verify($this->signer, $this->publicKey);
     }
+
+    public function token($token_string) {
+        return (new Lcobucci\JWT\Parser())->parse((string) $token_string);
+    }
 }
 ?>
