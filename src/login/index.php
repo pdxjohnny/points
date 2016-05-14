@@ -46,6 +46,7 @@ if ($user != false) {
     <div class="ui fixed menu">
         <div class="ui container">
             <a href="/" class="item">Leaderboard</a>
+            <a href="/search/" class="item">Search</a>
             <a href="/login/" class="header item">Login</a>
         </div>
     </div>
@@ -57,21 +58,19 @@ if ($user != false) {
                     <div class="content">Login</div>
                 </h2>
                 <form class="ui large form" action="/login/" method="POST">
-                    <div class="ui stacked segment">
-                        <div class="field">
-                            <div class="ui left icon input">
-                                <i class="user icon"></i>
-                                <input type="text" name="username" placeholder="E-mail address">
-                            </div>
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="user icon"></i>
+                            <input type="text" name="username" placeholder="E-mail address">
                         </div>
-                        <div class="field">
-                            <div class="ui left icon input">
-                                <i class="lock icon"></i>
-                                <input type="password" name="password" placeholder="Password">
-                            </div>
-                        </div>
-                        <button class="ui fluid large teal button">Login</button>
                     </div>
+                    <div class="field">
+                        <div class="ui left icon input">
+                            <i class="lock icon"></i>
+                            <input type="password" name="password" placeholder="Password">
+                        </div>
+                    </div>
+                    <button class="ui fluid large teal button">Login</button>
                     <?php if ($login_err != false) { ?>
                     <div class="ui negative message">
                         <p><?php echo $login_err;?></p>

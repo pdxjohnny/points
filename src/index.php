@@ -23,15 +23,20 @@
     <div class="ui fixed menu">
         <div class="ui container">
             <a href="/" class="header item">Leaderboard</a>
+            <a href="/search/" class="item">Search</a>
             <a href="/login/" class="item">Login</a>
         </div>
     </div>
 
     <div class="ui main text container">
-        <h2 class="ui teal image header">
-            <div class="content">Leaderboard</div>
-        </h2>
-        <p>Who's got the most points?</p>
+        <div class="ui middle aligned center aligned grid">
+            <div class="column">
+                <h2 class="ui teal image header">
+                    <div class="content">Leaderboard</div>
+                </h2>
+                <p>Who's got the most points?</p>
+            </div>
+        </div>
     </div>
 
 </body>

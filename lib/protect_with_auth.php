@@ -16,7 +16,7 @@ class ProtectWithAuth {
 
     public function set_token_and_redirect($user, $status, $url) {
         $this->redirect($status, $url);
-        setcookie("token", $user['token'], time() + 3600);
+        setcookie("token", $user['token'], time() + 3600, '/');
     }
 
     // Ensures that a user is logged in to see this resource

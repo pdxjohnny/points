@@ -2,7 +2,7 @@ FROM php:7.0-apache
 
 ARG DEPS_DIR=deps
 ARG SRC_DIR=/var/www/html
-ARG SRC_DIR=/var/www/lib
+ARG LIB_DIR=/var/www/lib
 
 COPY composer.json /var/www/
 
