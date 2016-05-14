@@ -1,7 +1,7 @@
 <?php
 require_once(__DIR__ . '/../vendor/autoload.php');
 
-class Token
+class Auth
 {
     private $signer;
     private $privateKey;
@@ -13,14 +13,13 @@ class Token
         $this->publicKey = new Lcobucci\JWT\Signer\Key('file://' . $_ENV['TOKEN_PUBLIC_KEY']);
     }
 
-    public function origin()
-    {
+    public function origin() {
         $protocol = stripos($_SERVER['SERVER_PROTOCOL'], 'https') === true ? 'https://' : 'http://';
         $domainName = $_SERVER['HTTP_HOST'] . '/';
         return $protocol . $domainName;
     }
 
-    public function create($user) {
+    public function create_token($user) {
         $token = (new Lcobucci\JWT\Builder())->setIssuer($this->origin())
             ->setAudience($this->origin())
             ->setId($user['id'] . "_" . time(), true)

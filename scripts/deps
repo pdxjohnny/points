@@ -1,0 +1,16 @@
+#!/bin/bash
+DEPS_DIR='src/deps'
+
+# JQuery
+mkdir -p $DEPS_DIR/jquery
+wget -O $DEPS_DIR/jquery/jquery.min.js \
+    https://code.jquery.com/jquery-2.2.3.min.js
+
+# Semantic
+mkdir -p $DEPS_DIR/semantic
+wget -O $DEPS_DIR/semantic/s.zip \
+    https://github.com/Semantic-Org/Semantic-UI-CSS/raw/master/dist.zip
+cd $DEPS_DIR/semantic
+unzip -o s.zip
+rm s.zip
+cd ../../../

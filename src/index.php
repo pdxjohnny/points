@@ -1,29 +1,38 @@
-<?php
-// Requires
-require_once('/var/www/lib/all.php');
-header('Content-Type: application/json');
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Standard Meta -->
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
-$args = array(
-    'id'		=> FILTER_VALIDATE_INT,
-    'username'	=> FILTER_SANITIZE_ENCODED,
-    'password'	=> FILTER_SANITIZE_ENCODED,
-);
+    <!-- Site Properties -->
+    <title>Leaderboard - Points</title>
 
-$user = filter_input_array(INPUT_GET, $args);
+    <link rel="stylesheet" type="text/css" href="/deps/semantic/semantic.min.css">
 
-function utf8ize($d) {
-    if (is_array($d)) {
-        foreach ($d as $k => $v) {
-            $d[$k] = utf8ize($v);
+    <style type="text/css">
+        .main.container {
+            margin-top: 7em;
         }
-    } else if (is_string ($d)) {
-        return utf8_encode($d);
-    }
-    return $d;
-}
+    </style>
+</head>
 
-$res = array(
-    'user'  => $database->create_user($user)
-);
-echo json_encode(utf8ize($res));
-?>
+<body>
+
+    <div class="ui fixed menu">
+        <div class="ui container">
+            <a href="/" class="header item">Leaderboard</a>
+            <a href="/login/" class="item">Login</a>
+        </div>
+    </div>
+
+    <div class="ui main text container">
+        <h2 class="ui teal image header">
+            <div class="content">Leaderboard</div>
+        </h2>
+        <p>Who's got the most points?</p>
+    </div>
+
+</body>
+</html>

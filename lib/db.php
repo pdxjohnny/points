@@ -6,7 +6,7 @@ class Database
 
     public function __construct()
     {
-        $this->token = new Token;
+        $this->auth = new Auth;
         $this->db = null;
         try {
             $conn = 'mysql:host=' . $_ENV['DB_PORT_3306_TCP_ADDR'] .
@@ -102,7 +102,7 @@ class Database
                 unset($row['password']);
                 $row['id'] = intval($row['id']);
                 // Create a login token for the user
-                $row['token'] = $this->token->create($row);
+                $row['token'] = $this->auth->create_token($row);
                 return $row;
             }
         }
@@ -111,9 +111,9 @@ class Database
 
     public function create_user($user)
     {
+        // Check if this username is alreay taken
         if ($this->check_user($user)) {
-            // Check if the user is trying to login
-            return $this->login_user($user);
+            return false;
         }
         if ($user == NULL || !isset($user['username']) || !isset($user['password']))
         {
@@ -130,7 +130,7 @@ class Database
         // Dont return the hashed password
         unset($user['password']);
         // Create a login token for the user
-        $user['token'] = $this->token->create($user);
+        $user['token'] = $this->auth->create_token($user);
         return $user;
     }
 
@@ -201,6 +201,4 @@ class Database
     }
 
 }
-
-$database = new Database;
 ?>
