@@ -47,6 +47,9 @@ class ErrorResponse {
 
     // Render the user response page
     public function render_ui() {
+        echo "hello";
+        $err = $this->err_to_array();
+        include(__DIR__ . '/../html/template/error.php');
     }
 
     // http://angelo.mandato.com/2008/12/31/php-function-http-status-code-value-as-string/

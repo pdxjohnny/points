@@ -21,12 +21,13 @@ class ProtectWithAuth {
 
     // Ensures that a user is logged in to see this resource
     public function logged_in() {
-        $error = $auth->verify_from_header();
-        if ($error != false) {
-            $this->error(false, $error);
-            return false;
+        if (isset($_COOKIE['token'])) {
+            return $this->auth->verify($_COOKIE['token']);
         }
-        return true;
+        if (isset(getallheaders()['Authorization'])) {
+            return $this->auth->verify(getallheaders()['Authorization']);
+        }
+        return false;
     }
 
     // Ensures that a user has permission to see resource

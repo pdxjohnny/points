@@ -1,11 +1,3 @@
-<?php
-require_once('/var/www/lib/all.php');
-$protect = new ProtectWithAuth;
-
-function display_user($user) {
-    echo $user->to_html();
-}
-?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,7 +7,7 @@ function display_user($user) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
     <!-- Site Properties -->
-    <title>Leaderboard - Points</title>
+    <title>Error - Points</title>
 
     <link rel="stylesheet" type="text/css" href="/deps/semantic/semantic.min.css">
 
@@ -44,17 +36,14 @@ function display_user($user) {
     <div class="ui main text container">
         <div class="ui middle aligned center aligned grid">
             <div class="column">
-                <h2 class="ui teal image header">
-                    <div class="content">Leaderboard</div>
-                </h2>
-                <p>Who's got the most points?</p>
+                <h1 class="ui red image header">
+                    <div class="content">Error <?php echo $err['code'];?></div>
+                </h1>
+                <div class="ui negative message">
+                    <p><?php echo $err['reason'];?></p>
+                    <p><?php echo $err['message'];?></p>
+                </div>
             </div>
-        </div>
-        <div class="ui list">
-            <?php
-            $database = new Database;
-            $database->top_100_users(display_user);
-            ?>
         </div>
     </div>
 
