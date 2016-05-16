@@ -54,6 +54,7 @@ if ($bounty != false) {
                 <div class="menu">
                     <a href="/bounty/view/" class="item">View</a>
                     <a href="/bounty/create/" class="item">Create</a>
+                     <a href="/bounty/award/" class="item">Award</a>
                 </div>
             </div>
             <a href="/login/" class="item">Login</a>

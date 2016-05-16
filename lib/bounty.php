@@ -31,7 +31,7 @@ class Bounty {
         );
     }
 
-    public function to_html() {
+    public function to_html($extra="") {
         $creator_name = $this->db->username($this->creator);
         $awarded_name = $this->db->username($this->awarded);
         $creator_img = "https://www.gravatar.com/avatar/";
@@ -46,13 +46,14 @@ class Bounty {
         $html .= "<div class=\"description\">";
         $html .= "<p>Worth <b>" . $this->points . "</b> points</p>";
         $html .= "<p>" . xssafe($this->description) . "</p>";
-        if ($this->awarded != 0) {
-            $html .= "<br>";
-            $html .= "<p><img class=\"ui avatar image\" src=\"" . $awared_img . "\"/>Awarded to " . xssafe($awared_name) . "</p>";
+        if ($this->awarded != 0 && $this->awarded != NULL) {
+            $html .= "<p><img class=\"ui avatar image\" src=\"" . $awarded_img . "\"/>Awarded to " . xssafe($awarded_name) . "</p>";
         }
         $html .= "</div>";
         $html .= "</div>";
         $html .= "</div>";
+        // If we have been asked to add soemthing
+        $html .= $extra;
         $html .= "</div>";
         return $html;
     }

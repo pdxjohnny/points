@@ -95,6 +95,26 @@ class Database
         return $bounty;
     }
 
+    public function bountys_to_award($creator, $onbounty) {
+        $statement = $this->db->prepare('SELECT * FROM BOUNTY WHERE creator=:creator ORDER BY awarded');
+        $statement->bindValue(':creator', $creator, PDO::PARAM_INT);
+        $statement->execute();
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $onbounty(new Bounty($row));
+        }
+        return true;
+    }
+
+    public function bountys_awarded($awarded, $onbounty) {
+        $statement = $this->db->prepare('SELECT * FROM BOUNTY WHERE awarded=:awarded ORDER BY points');
+        $statement->bindValue(':awarded', $awarded, PDO::PARAM_INT);
+        $statement->execute();
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $onbounty(new Bounty($row));
+        }
+        return true;
+    }
+
     public function top_100_bountys($onbounty) {
         $statement = $this->db->prepare('SELECT * FROM BOUNTY WHERE awarded IS NULL ORDER BY points DESC LIMIT 100');
         $statement->execute();
@@ -111,6 +131,13 @@ class Database
             $onuser(new User($row));
         }
         return true;
+    }
+
+    public function user_id($username) {
+        $username = array(
+            'username'  =>  $username,
+        );
+        return $this->check_user($username)->id;
     }
 
     public function username($id) {

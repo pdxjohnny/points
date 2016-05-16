@@ -39,7 +39,7 @@ if (isset($giver['uid']) && isset($bounty_info['points'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
     <!-- Site Properties -->
-    <title>Bounty - Points</title>
+    <title>Create - Points</title>
 
     <link rel="stylesheet" type="text/css" href="/deps/semantic/semantic.min.css">
 
@@ -61,6 +61,7 @@ if (isset($giver['uid']) && isset($bounty_info['points'])) {
                 <div class="menu">
                     <a href="/bounty/view/" class="item">View</a>
                     <a href="/bounty/create/" class="item"><b>Create</b></a>
+                    <a href="/bounty/award/" class="item">Award</a>
                 </div>
             </div>
             <a href="/login/" class="item">Login</a>

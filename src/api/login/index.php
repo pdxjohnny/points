@@ -5,11 +5,12 @@ header('Content-Type: application/json');
 
 $args = array(
     'id'		=> FILTER_VALIDATE_INT,
-    'username'	=> FILTER_SANITIZE_ENCODED,
+    'username'	=> FILTER_VALIDATE_EMAIL,
     'password'	=> FILTER_SANITIZE_ENCODED,
 );
 
 $user = client_input($args);
+var_dump($user);
 
 $database = new Database;
 $user = $database->login_user($user);

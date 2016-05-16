@@ -52,6 +52,7 @@ if ($user != false) {
                 <div class="menu">
                     <a href="/bounty/view/" class="header item">View</a>
                     <a href="/bounty/create/" class="header item">Create</a>
+                     <a href="/bounty/award/" class="item">Award</a>
                 </div>
             </div>
             <a href="/register/" class="header item">Register</a>

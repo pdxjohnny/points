@@ -6,7 +6,37 @@ if (!$protect->logged_in()) {
     return;
 }
 function display_bounty($bounty) {
-    echo $bounty->to_html();
+    $extra = "";
+    if ($bounty->awarded == NULL || $bounty->awarded == 0) {
+        $extra .= "<form class=\"ui large form\" action=\"/bounty/award/\" method=\"POST\">";
+        $extra .= "<div class=\"field\">";
+        $extra .= "<div class=\"ui left icon input\">";
+        $extra .= "<i class=\"user icon\"></i>";
+        $extra .= "<input name=\"awarded\" placeholder=\"E-mail to award to\"/>";
+        $extra .= "<input type=\"hidden\" name=\"id\" value=\"" . $bounty->id . "\"/>";
+        $extra .= "</div>";
+        $extra .= "</div>";
+        $extra .= "</form>";
+    }
+    echo $bounty->to_html($extra);
+}
+
+$args = array(
+    'id'        =>  FILTER_VALIDATE_INT,
+    'awarded'   =>  FILTER_VALIDATE_EMAIL,
+);
+
+$bounty_info = client_input($args);
+
+$user = $protect->user_data();
+if (isset($user['uid']) && isset($bounty_info['awarded'])) {
+    $database = new Database;
+    $bounty = $database->check_bounty($bounty_info);
+    // The creator of the bounty has to match the logged in user
+    if ($bounty != false && $bounty->creator == $user['uid']) {
+        $bounty->awarded = $database->user_id($bounty_info['awarded']);
+        $bounty = $database->award_bounty($bounty);
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -18,7 +48,7 @@ function display_bounty($bounty) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
     <!-- Site Properties -->
-    <title>View - Points</title>
+    <title>Award - Points</title>
 
     <link rel="stylesheet" type="text/css" href="/deps/semantic/semantic.min.css">
 
@@ -42,9 +72,9 @@ function display_bounty($bounty) {
             <div class="ui simple dropdown item">
                 <b>Bounty</b> <i class="dropdown icon"></i>
                 <div class="menu">
-                    <a href="/bounty/view/" class="item"><b>View</b></a>
+                    <a href="/bounty/view/" class="item">View</a>
                     <a href="/bounty/create/" class="item">Create</a>
-                     <a href="/bounty/award/" class="item">Award</a>
+                     <a href="/bounty/award/" class="item"><b>Award</b></a>
                 </div>
             </div>
             <a href="/login/" class="item">Login</a>
@@ -55,15 +85,14 @@ function display_bounty($bounty) {
         <div class="ui middle aligned center aligned grid">
             <div class="column">
                 <h2 class="ui teal image header">
-                    <div class="content">Bountys</div>
+                    <div class="content">Award Bountys</div>
                 </h2>
-                <p>What points are up for grabs?</p>
             </div>
         </div>
         <div class="ui list">
             <?php
             $database = new Database;
-            $database->top_100_bountys(display_bounty);
+            $database->bountys_to_award($user['uid'], display_bounty);
             ?>
         </div>
     </div>

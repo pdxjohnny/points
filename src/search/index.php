@@ -1,6 +1,11 @@
 <?php
 require_once('/var/www/lib/all.php');
 $protect = new ProtectWithAuth;
+
+function display_bounty($bounty) {
+    echo $bounty->to_html();
+}
+
 $search_user = "";
 $search_err = false;
 $search_res = false;
@@ -52,6 +57,7 @@ if ($user != false) {
                 <div class="menu">
                     <a href="/bounty/view/" class="header item">View</a>
                     <a href="/bounty/create/" class="header item">Create</a>
+                     <a href="/bounty/award/" class="item">Award</a>
                 </div>
             </div>
             <a href="/login/" class="item">Login</a>
@@ -81,7 +87,14 @@ if ($user != false) {
                     <div class="ui message">
                         <p><?php echo $search_res;?></p>
                     </div>
-                    <?php } ?>
+                    <?php
+                        if($protect->logged_in()) {
+                            $database->bountys_awarded($user->id, display_bounty);
+                        }
+                    }
+                    ?>
+                    <div class="ui list">
+                    </div>
                 </form>
             </div>
         </div>
