@@ -116,7 +116,7 @@ class Database
     }
 
     public function top_100_bountys($onbounty) {
-        $statement = $this->db->prepare('SELECT * FROM BOUNTY WHERE awarded IS NULL ORDER BY points DESC LIMIT 100');
+        $statement = $this->db->prepare('SELECT * FROM BOUNTY WHERE awarded IS NULL OR awarded = 0 ORDER BY points DESC LIMIT 100');
         $statement->execute();
         while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
             $onbounty(new Bounty($row));
