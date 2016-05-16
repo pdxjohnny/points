@@ -47,7 +47,6 @@ class ErrorResponse {
 
     // Render the user response page
     public function render_ui() {
-        echo "hello";
         $err = $this->err_to_array();
         include(__DIR__ . '/../html/template/error.php');
     }

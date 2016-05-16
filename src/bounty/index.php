@@ -1,23 +1,25 @@
 <?php
 require_once('/var/www/lib/all.php');
 $protect = new ProtectWithAuth;
-$search_user = "";
+if (!$protect->logged_in()) {
+    $protect->error(false, "Please login to access bountys");
+    return;
+}
 $search_err = false;
 $search_res = false;
 
 $args = array(
-    'username'	=> FILTER_VALIDATE_EMAIL,
+    'id'    =>  FILTER_VALIDATE_INT,
 );
 
-$user = client_input($args);
-if ($user != false) {
-    $search_user = $user['username'];
+$bounty = client_input($args);
+if ($bounty != false) {
     $database = new Database;
-    $user = $database->check_user($user);
-    if ($user == false) {
-        $search_err = "Could not find that user";
+    $bounty = $database->check_bounty($bounty);
+    if ($bounty == false) {
+        $search_err = "Could not find that bounty";
     } else {
-        $search_res = $user->to_html();
+        $search_res = $bounty->to_html();
     }
 }
 ?>
@@ -30,7 +32,7 @@ if ($user != false) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
     <!-- Site Properties -->
-    <title>Search - Points</title>
+    <title>Bounty - Points</title>
 
     <link rel="stylesheet" type="text/css" href="/deps/semantic/semantic.min.css">
 
@@ -46,12 +48,12 @@ if ($user != false) {
     <div class="ui fixed menu">
         <div class="ui container">
             <a href="/" class="item">Leaderboard</a>
-            <a href="/search/" class="header item">Search</a>
+            <a href="/search/" class="item">Search</a>
             <div class="ui simple dropdown item">
-                Bounty <i class="dropdown icon"></i>
+                <b>Bounty</b> <i class="dropdown icon"></i>
                 <div class="menu">
-                    <a href="/bounty/view/" class="header item">View</a>
-                    <a href="/bounty/create/" class="header item">Create</a>
+                    <a href="/bounty/view/" class="item">View</a>
+                    <a href="/bounty/create/" class="item">Create</a>
                 </div>
             </div>
             <a href="/login/" class="item">Login</a>
@@ -61,27 +63,14 @@ if ($user != false) {
     <div class="ui main text container">
         <div class="ui middle aligned center aligned grid">
             <div class="column">
-                <h2 class="ui teal image header">
-                    <div class="content">Search</div>
-                </h2>
-                <form class="ui large form" action="/search/" method="GET">
-                    <div class="field">
-                        <div class="ui left icon input">
-                            <i class="user icon"></i>
-                            <input type="text" name="username" placeholder="E-mail address" value="<?php echo $search_user;?>">
-                        </div>
-                    </div>
-                    <button class="ui fluid large teal button">Search</button>
                     <?php if ($search_err != false) { ?>
                     <div class="ui negative message">
                         <p><?php echo $search_err;?></p>
                     </div>
                     <?php } ?>
-                    <?php if ($search_res != false) { ?>
-                    <div class="ui message">
-                        <p><?php echo $search_res;?></p>
-                    </div>
-                    <?php } ?>
+                    <?php if ($search_res != false) {
+                        echo $search_res;
+                    } ?>
                 </form>
             </div>
         </div>

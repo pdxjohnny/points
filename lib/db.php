@@ -23,7 +23,7 @@ class Database
         $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $this->db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
         $this->db->setAttribute(PDO::MYSQL_ATTR_INIT_COMMAND, 'SET NAMES UTF8');
-        $this->create_users();
+        $this->create_tables();
     }
 
     public function table_exists($table_name)
@@ -45,10 +45,63 @@ class Database
         return $exists;
     }
 
-    private function create_users() {
+    private function create_tables() {
         if (!$this->table_exists('USERS')) {
             $this->db->exec("CREATE TABLE IF NOT EXISTS USERS (id INT NOT NULL AUTO_INCREMENT, username VARCHAR(100) NOT NULL, password VARCHAR(100) NOT NULL, points INT DEFAULT 100, PRIMARY KEY (id))");
         }
+        if (!$this->table_exists('BOUNTY')) {
+            $this->db->exec("CREATE TABLE IF NOT EXISTS BOUNTY (id INT NOT NULL AUTO_INCREMENT, creator INT NOT NULL, awarded INT DEFAULT 0, title VARCHAR(100) NOT NULL, description VARCHAR(500), points INT DEFAULT 0, PRIMARY KEY (id))");
+        }
+    }
+
+    public function create_bounty($bounty) {
+        if ($bounty == NULL) {
+            return new Bounty;
+        }
+        // Subtract from the creators points
+        $statement = $this->db->prepare("UPDATE USERS SET points=points - :points WHERE id=:creator AND points >= :points");
+        $statement->bindValue(':points', $bounty->points, PDO::PARAM_INT);
+        $statement->bindValue(':creator', $bounty->creator, PDO::PARAM_INT);
+        $statement->execute();
+        // Creator did not have enough points
+        if ($statement->rowCount() < 1) {
+            return $bounty;
+        }
+        // Create the bounty
+        $statement = $this->db->prepare("INSERT INTO BOUNTY(creator,title,description,points) VALUES(:creator,:title,:description,:points)");
+        $statement->bindValue(':creator', $bounty->creator, PDO::PARAM_INT);
+        $statement->bindValue(':title', $bounty->title, PDO::PARAM_STR);
+        $statement->bindValue(':description', $bounty->description, PDO::PARAM_STR);
+        $statement->bindValue(':points', $bounty->points, PDO::PARAM_INT);
+        $statement->execute();
+        $bounty->id = intval($this->db->lastInsertId());
+        return $bounty;
+    }
+
+    public function award_bounty($bounty) {
+        if ($bounty == NULL) {
+            return new Bounty;
+        }
+        $statement = $this->db->prepare("UPDATE BOUNTY SET awarded=:awarded WHERE id=:id AND creator=:creator");
+        $statement->bindValue(':awarded', $bounty->awarded, PDO::PARAM_INT);
+        $statement->bindValue(':id', $bounty->id, PDO::PARAM_INT);
+        $statement->bindValue(':creator', $bounty->creator, PDO::PARAM_INT);
+        $statement->execute();
+        // Add to the awrareds points
+        $statement = $this->db->prepare("UPDATE USERS SET points=points + :points WHERE id=:awarded");
+        $statement->bindValue(':points', $bounty->points, PDO::PARAM_INT);
+        $statement->bindValue(':awarded', $bounty->awarded, PDO::PARAM_INT);
+        $statement->execute();
+        return $bounty;
+    }
+
+    public function top_100_bountys($onbounty) {
+        $statement = $this->db->prepare('SELECT * FROM BOUNTY WHERE awarded IS NULL ORDER BY points DESC LIMIT 100');
+        $statement->execute();
+        while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            $onbounty(new Bounty($row));
+        }
+        return true;
     }
 
     public function top_100_users($onuser) {
@@ -58,6 +111,28 @@ class Database
             $onuser(new User($row));
         }
         return true;
+    }
+
+    public function username($id) {
+        $id = array(
+            'id'    =>  $id,
+        );
+        return $this->check_user($id)->username;
+    }
+
+    public function check_bounty($bounty)
+    {
+        if (isset($bounty['id'])) {
+            $statement = $this->db->prepare('SELECT * FROM BOUNTY WHERE id=:id');
+            $statement->bindValue(':id', $bounty['id'], PDO::PARAM_INT);
+        } else {
+            return false;
+        }
+        $statement->execute();
+        if ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+            return new Bounty($row);
+        }
+        return false;
     }
 
     public function check_user($user)

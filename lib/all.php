@@ -1,5 +1,6 @@
 <?php
 require_once('user.php');
+require_once('bounty.php');
 require_once('input.php');
 require_once('output.php');
 require_once('auth.php');

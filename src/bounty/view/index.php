@@ -1,3 +1,14 @@
+<?php
+require_once('/var/www/lib/all.php');
+$protect = new ProtectWithAuth;
+if (!$protect->logged_in()) {
+    $protect->error(false, "Please login to access bountys");
+    return;
+}
+function display_bounty($bounty) {
+    echo $bounty->to_html();
+}
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,7 +18,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 
     <!-- Site Properties -->
-    <title>Error - Points</title>
+    <title>Leaderboard - Points</title>
 
     <link rel="stylesheet" type="text/css" href="/deps/semantic/semantic.min.css">
 
@@ -29,10 +40,10 @@
             <a href="/" class="item">Leaderboard</a>
             <a href="/search/" class="item">Search</a>
             <div class="ui simple dropdown item">
-                Bounty <i class="dropdown icon"></i>
+                <b>Bounty</b> <i class="dropdown icon"></i>
                 <div class="menu">
-                    <a href="/bounty/view/" class="header item">View</a>
-                    <a href="/bounty/create/" class="header item">Create</a>
+                    <a href="/bounty/view/" class="item"><b>View</b></a>
+                    <a href="/bounty/create/" class="item">Create</a>
                 </div>
             </div>
             <a href="/login/" class="item">Login</a>
@@ -42,14 +53,17 @@
     <div class="ui main text container">
         <div class="ui middle aligned center aligned grid">
             <div class="column">
-                <h1 class="ui red image header">
-                    <div class="content">Error <?php echo $err['code'];?></div>
-                </h1>
-                <div class="ui negative message">
-                    <p><?php echo $err['reason'];?></p>
-                    <p><?php echo $err['message'];?></p>
-                </div>
+                <h2 class="ui teal image header">
+                    <div class="content">Bountys</div>
+                </h2>
+                <p>What points are up for grabs?</p>
             </div>
+        </div>
+        <div class="ui list">
+            <?php
+            $database = new Database;
+            $database->top_100_bountys(display_bounty);
+            ?>
         </div>
     </div>
 

@@ -16,4 +16,8 @@ function utf8ize($d) {
     }
     return $d;
 }
+
+function xssafe($data, $encoding='UTF-8') {
+    return htmlspecialchars($data, ENT_QUOTES | ENT_HTML5, $encoding);
+}
 ?>

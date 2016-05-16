@@ -47,7 +47,13 @@ if ($user != false) {
         <div class="ui container">
             <a href="/" class="item">Leaderboard</a>
             <a href="/search/" class="item">Search</a>
-            <a href="/award/" class="item">Award</a>
+            <div class="ui simple dropdown item">
+                Bounty <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a href="/bounty/view/" class="header item">View</a>
+                    <a href="/bounty/create/" class="header item">Create</a>
+                </div>
+            </div>
             <a href="/login/" class="header item">Login</a>
         </div>
     </div>
